@@ -9,7 +9,7 @@ import java.util.*;
  * Created by S.King on 08/10/2016.
  */
 public final class MessageBus {
-    private Map<Integer, Queue<String>> messages = new LinkedHashMap<>();
+    private Map<Integer, Queue<String>> messages = Collections.synchronizedMap(new LinkedHashMap<>(200));
     private Map<Integer, List<MessageListener>> listeners = new HashMap<>();
 
     private static MessageBus messageBus = null;
@@ -18,12 +18,13 @@ public final class MessageBus {
     }
 
     public static MessageBus getInstance() {
-        if (messageBus == null) {
-            synchronized (MessageBus.class) {
-                messageBus = new MessageBus();
+        synchronized (MessageBus.class) {
+            if (messageBus == null) {
+                synchronized (MessageBus.class) {
+                    messageBus = new MessageBus();
+                }
             }
         }
-
         return messageBus;
     }
 
